@@ -1,4 +1,4 @@
-ftp
+ftp/*
 02_SpectralAngles/results/pool*
 04_Dimensionality/results/pcs*
 08_SpectralCal/results/transmission*
