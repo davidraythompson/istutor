@@ -23,7 +23,7 @@ After, install the required dependencies from:
 
 An easy cross-platform way to get all the necessary Python dependencies (and Juypter Notebook) is to download and install the Anaconda distribution, freely available here: <https://www.anaconda.com/distribution/>.  
 
-Finally, there are a few large binary files that you will need for certain exercises, and are not stored in the repository due to their size. These are currently posted at <ftp://popo.jpl.nasa.gov/pub/DThompson/istutor/>. This location is subject to change. Download all of the files at this FTP site and store them in a base level folder in the `istutor` repository named `ftp`.
+Finally, there are a few large binary files that you will need for certain exercises, and are not stored in the repository due to their size. These files should be downloaded from our [NASA JPL FTP site](ftp://popo.jpl.nasa.gov/pub/DThompson/istutor/) before starting the tutorials. Note that this location is subject to change. Download all of the files at this FTP site and store them in a base level folder in the `istutor` repository named `ftp`.
 
 ## Citation
 
