@@ -1,5 +1,5 @@
 ftp
-02_SpectralAngles/results
+02_SpectralAngles/results/pool*
 04_Dimensionality/results/pcs*
 .DS_Store
 .ipynb_checkpoints
