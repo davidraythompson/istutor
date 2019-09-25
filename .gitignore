@@ -1,6 +1,6 @@
 ftp
 02_SpectralAngles/results
-04_Dimensionality/results
+04_Dimensionality/results/pcs*
 .DS_Store
 .ipynb_checkpoints
 __pycache__
