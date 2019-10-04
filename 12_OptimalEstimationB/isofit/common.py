@@ -400,7 +400,7 @@ class VectorInterpolatorJIT:
 @jit
 def jitinterp(s_in_d, s_out_d, s_grid, s_data, point):
 
-        # we find the bottom index along each input dimension
+    # We find the bottom index along each input dimension
     lo_inds = s.zeros(s_in_d)
     lo_fracs = s.zeros(s_in_d)
     stride = []
@@ -411,7 +411,7 @@ def jitinterp(s_in_d, s_out_d, s_grid, s_data, point):
         n_gridpoints = len(s_grid[d])
         for j in s.arange(n_gridpoints-1):
             if j == 0 and s_grid[d][j] >= point[d]:
-                lo_inds[d] = 0
+                lo_inds[d] = 0.0
                 lo_fracs[d] = 1.0
                 break
             if j == n_gridpoints-2 and s_grid[d][-1] <= point[d]:
