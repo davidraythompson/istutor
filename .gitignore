@@ -1,11 +1,11 @@
-ftp/*
+ftp/
+.vscode/
+__pycache__/
 ang20140625t192252_rfl_bip
 02_SpectralAngles/results/pool*
 04_Dimensionality/results/pcs*
 08_SpectralCal/results/transmission*
-.vscode/
 .DS_Store
 .ipynb_checkpoints
-__pycache__
 *.pyc
 *~$
