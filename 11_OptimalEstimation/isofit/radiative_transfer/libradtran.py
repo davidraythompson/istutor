@@ -17,31 +17,21 @@
 # Author: David R Thompson, david.r.thompson@jpl.nasa.gov
 #
 
-import json
 import os
-import sys
-import re
-import time
 import logging
 import scipy as s
-from spectral.io import envi
-from scipy.io import loadmat, savemat
-from common import json_load_ascii, combos, VectorInterpolator
-from common import recursive_replace
-from copy import deepcopy
-from scipy.linalg import block_diag, det, norm, pinv, sqrtm, inv
-from scipy.signal import convolve, gaussian, medfilt
 from scipy.interpolate import interp1d
-from scipy.optimize import minimize_scalar as min1d
-from scipy.stats import multivariate_normal as mvn
-import pylab as plt
-import multiprocessing
-import subprocess
-from rt_lut import TabularRT, FileExistsError, spawn_rt
-from common import resample_spectrum
+
+from ..core.common import resample_spectrum
+from .look_up_tables import TabularRT, FileExistsError
+
+
+### Variables ###
 
 eps = 1e-5  # used for finite difference derivative calculations
 
+
+### Classes ###
 
 class LibRadTranRT(TabularRT):
     """A model of photon transport including the atmosphere."""
@@ -54,7 +44,7 @@ class LibRadTranRT(TabularRT):
         self.build_lut()
 
     def find_basedir(self, config):
-        '''Seek out a libradtran base directory'''
+        """Seek out a libradtran base directory."""
 
         try:
             return config['libradtran_directory']
@@ -67,6 +57,7 @@ class LibRadTranRT(TabularRT):
         return None
 
     def rebuild_cmd(self, point, fn):
+        """."""
 
         # start with defaults
         vals = {'atmosphere': 'midlatitude_summer'}
@@ -176,7 +167,7 @@ class LibRadTranRT(TabularRT):
         return 'bash '+scriptfilepath
 
     def load_rt(self, point, fn):
-        """Load the results of a LibRadTran run """
+        """Load the results of a LibRadTran run."""
 
         wl, rdn0,   irr = s.loadtxt(self.lut_dir+'/LUT_'+fn+'_alb0.out').T
         wl, rdn025, irr = s.loadtxt(self.lut_dir+'/LUT_'+fn+'_alb025.out').T

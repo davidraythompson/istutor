@@ -25,8 +25,8 @@ from scipy.optimize import minimize_scalar as min1d
 
 
 def heuristic_atmosphere(RT, instrument, x_RT, x_instrument,  meas, geom):
-    '''From a given radiance, estimate atmospheric state with band ratios.
-    Used to initialize gradient descent inversions.'''
+    """From a given radiance, estimate atmospheric state with band ratios.
+    Used to initialize gradient descent inversions."""
 
     # Identify the latest instrument wavelength calibration (possibly
     # state-dependent) and identify channel numbers for the band ratio.
@@ -66,13 +66,15 @@ def heuristic_atmosphere(RT, instrument, x_RT, x_instrument,  meas, geom):
             rhoatm_hi, sphalb_hi, transm_hi, transup_hi = RT.get(x_RT_2, geom)
             rhoatm = instrument.sample(x_instrument, RT.wl, rhoatm_hi)
             transm = instrument.sample(x_instrument, RT.wl, transm_hi)
+            sphalb = instrument.sample(x_instrument, RT.wl, sphalb_hi)
             solar_irr = instrument.sample(x_instrument, RT.wl, RT.solar_irr)
 
             # Assume no surface emission.  "Correct" the at-sensor radiance
             # using this presumed amount of water vapor, and measure the
             # resulting residual (as measured from linear interpolation across
             # the absorption feature)
-            r = (meas*s.pi/(solar_irr*RT.coszen) - rhoatm) / (transm+1e-8)
+            rho = meas * s.pi / (solar_irr * RT.coszen)
+            r = 1.0 / (transm / (rho - rhoatm) + sphalb)
             ratios.append((r[b945]*2.0)/(r[b1040]+r[b865]))
             h2os.append(h2o)
 
@@ -85,10 +87,8 @@ def heuristic_atmosphere(RT, instrument, x_RT, x_instrument,  meas, geom):
     return x_new
 
 
-def invert_algebraic(surface, RT, instrument, x_surface, x_RT, x_instrument,
-                     meas, geom):
-    '''Inverts radiance algebraically using Lambertian assumptions to get a 
-       reflectance.'''
+def invert_algebraic(surface, RT, instrument, x_surface, x_RT, x_instrument, meas, geom):
+    """Inverts radiance algebraically using Lambertian assumptions to get a reflectance."""
 
     # Get atmospheric optical parameters (possibly at high
     # spectral resolution) and resample them if needed.
@@ -101,8 +101,8 @@ def invert_algebraic(surface, RT, instrument, x_surface, x_RT, x_instrument,
     transup = instrument.sample(x_instrument, RT.wl, transup_hi)
     coszen = RT.coszen
 
-    # surface and measured wavelengths may differ.  Calculate
-    # the initial emission and subtract from the measurement
+    # Calculate the initial emission and subtract from the measurement.
+    # Surface and measured wavelengths may differ.
     Ls = surface.calc_Ls(x_surface, geom)
     Ls_meas = interp1d(surface.wl, Ls, fill_value='extrapolate')(wl)
     rdn_solrfl = meas - (transup * Ls_meas)
@@ -121,10 +121,10 @@ def invert_algebraic(surface, RT, instrument, x_surface, x_RT, x_instrument,
 
 def estimate_Ls(coeffs, rfl, rdn, geom):
     """Estimate the surface emission for a given state vector and 
-       reflectance/radiance pair.  This is determined by the residual
-       between the upward-welling radiance due to surface and 
-       scattering, and the measured radiance.  We account for 
-       atmospheric transmission on the upward path."""
+    reflectance/radiance pair. This is determined by the residual
+    between the upward-welling radiance due to surface and 
+    scattering, and the measured radiance. We account for 
+    atmospheric transmission on the upward path."""
 
     rhoatm, sphalb, transm, solar_irr, coszen, transup = coeffs
     rho = rhoatm + transm * rfl / (1.0 - sphalb * rfl)
@@ -133,7 +133,7 @@ def estimate_Ls(coeffs, rfl, rdn, geom):
 
 
 def invert_simple(forward, meas, geom):
-    """Find an initial guess at the state vector.  This currently uses
+    """Find an initial guess at the state vector. This currently uses
     traditional (non-iterative, heuristic) atmospheric correction."""
 
     surface = forward.surface
@@ -149,6 +149,7 @@ def invert_simple(forward, meas, geom):
 
     # Now, with atmosphere fixed, we can invert the radiance algebraically
     # via Lambertian approximations to get reflectance
+    x_surface, x_RT, x_instrument = forward.unpack(x)
     rfl_est, Ls_est, coeffs = invert_algebraic(surface, RT,
                                                instrument, x_surface, x_RT, x_instrument, meas, geom)
 

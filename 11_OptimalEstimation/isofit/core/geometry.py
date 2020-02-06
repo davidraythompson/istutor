@@ -18,15 +18,16 @@
 # Author: David R Thompson, david.r.thompson@jpl.nasa.gov
 #
 
-import scipy as s
 import logging
-from sunposition import sunpos
 from datetime import datetime
+import scipy as s
+
+from .sunposition import sunpos
 
 
 class Geometry:
     """The geometry of the observation, all we need to calculate sensor,
-      surface and solar positions"""
+      surface, and solar positions."""
 
     def __init__(self, obs=None, glt=None, loc=None, ds=None,
                  esd=None, pushbroom_column=None):
@@ -61,14 +62,14 @@ class Geometry:
             self.solar_zenith = obs[4]  # 0 to 90 from zenith
             self.OBSZEN = 180.0 - abs(obs[2])  # MODTRAN convention?
             self.RELAZ = obs[1] - obs[3] + 180.0
-            self.TRUEAZ = self.RELAZ  # MODTRAN convention?
+            self.TRUEAZ = obs[1]  # MODTRAN convention?
             self.umu = s.cos(obs[2]/360.0*2.0*s.pi)  # Libradtran
 
         # The 'loc' object is a list-like object that optionally contains
         # latitude and longitude information about the surface being
         # observed.
         if loc is not None:
-            self.GNDALT = loc[2]
+            self.GNDALT = loc[2] / 1000.0
             self.altitude = loc[2]
             self.surface_elevation_km = loc[2] / 1000.0
             self.latitude = loc[1]
@@ -79,8 +80,8 @@ class Geometry:
 
             logging.debug('Geometry lat: %f lon: %f' %
                           (self.latitude, self.longitude))
-            logging.debug('Geometry observer OBSZEN: %f RELAZ: %f' %
-                          (self.OBSZEN, self.RELAZ))
+            logging.debug('Geometry observer OBSZEN: %f RELAZ: %f GNDALT: %f' %
+                          (self.OBSZEN, self.RELAZ, self.GNDALT))
 
         # The ds object is an optional date object, defining the time of
         # the observation.
